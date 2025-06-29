@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fortune Cookie</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f9f9f9; }
+    #fortune { font-size: 2em; text-align: center; padding: 20px; border: 1px solid #ccc; background: #fff; }
+  </style>
+</head>
+<body>
+  <div id="fortune">Tap the NFC tag to get your fortune!</div>
+
+  <script>
+    const fortunes = [
+      "A new adventure is coming your way.",
+      "Trust your instincts today.",
+      "You’ll make someone smile soon.",
+      "Opportunity knocks lightly—be ready!",
+      "A pleasant surprise is in store."
+      // ← add more lines here, each in quotes, separated by commas
+    ];
+
+    // pick & display one at random
+    document.getElementById('fortune').textContent =
+      fortunes[Math.floor(Math.random() * fortunes.length)];
+  </script>
+</body>
+</html>
