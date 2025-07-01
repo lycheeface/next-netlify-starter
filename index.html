@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Fortune Cookie</title>
   <style>
+    /* Page centering & background */
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -18,9 +19,9 @@
     #fortune {
       position: relative;
       width: 300px;
-      height: 100px;
       perspective: 600px;
       cursor: pointer;
+      margin: 0 auto;
     }
 
     /* Cookie-shell halves using pseudo-elements */
@@ -40,18 +41,28 @@
     #fortune::before { left: 0; transform-origin: 100% 50%; }
     #fortune::after  { right: 0; transform-origin:   0% 50%; }
 
-    /* Hidden text */
+    /* Fortune slip text styling */
     .fortune-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      position: relative;
+      display: block;
+      width: 280px;
+      margin: 10px auto;
+      padding: 10px 15px;
+      background: #fff;
+      border: 1px solid #ccc;
+      font-family: 'Times New Roman', serif;
+      color: #2a4d69;
+      font-size: 1em;
+      text-align: center;
+      line-height: 1.4;
       opacity: 0;
       transition: opacity 0.4s 0.6s ease;
-      font-size: 1.2em;
-      text-align: center;
-      padding: 0 10px;
       z-index: 1;
+    }
+    /* Bold Lucky Numbers label */
+    .fortune-text strong {
+      display: block;
+      margin-top: 10px;
     }
 
     /* Open state animations */
@@ -68,27 +79,16 @@
 </head>
 <body>
   <div id="fortune">
-    <span class="fortune-text">Tap for your fortune!</span>
+    <div class="fortune-text">
+      Be willing to be uncomfortable. Be comfortable being uncomfortable. It may get tough.
+      <strong>Lucky Numbers 22, 38, 4, 26, 8, 49</strong>
+    </div>
   </div>
 
   <script>
-    const fortunes = [
-      "A new adventure is coming your way.",
-      "Trust your instincts today.",
-      "You’ll make someone smile soon.",
-      "Opportunity knocks lightly—be ready!",
-      "A pleasant surprise is in store.",
-      "Momo sends his love."
-      // add more fortunes here
-    ];
-
+    // Click to open and reveal
     const fc = document.getElementById('fortune');
-    const ft = fc.querySelector('.fortune-text');
-
     fc.addEventListener('click', () => {
-      // pick a random fortune
-      ft.textContent = fortunes[Math.floor(Math.random() * fortunes.length)];
-      // toggle opening animation
       fc.classList.toggle('open');
     });
   </script>
