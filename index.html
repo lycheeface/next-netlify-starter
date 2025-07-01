@@ -4,18 +4,43 @@
   <meta charset="UTF-8">
   <title>Fortune Cookie</title>
   <style>
-    /* Page centering & background */
+    /* ─── Page centering & background ─────────────────────────────────── */
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background: #f9f9f9;
+      background: #eef4fb;
+      font-family: Georgia, serif;
     }
 
-    /* Fortune cookie container */
+    /* ─── Controls for adding fortunes ─────────────────────────────────── */
+    #controls {
+      margin-bottom: 1.5em;
+      text-align: center;
+    }
+    #controls textarea,
+    #controls input {
+      font-family: Georgia, serif;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 0.2em;
+      width: 250px;
+    }
+    #controls button {
+      padding: 0.5em 1em;
+      font-family: Georgia, serif;
+      background: #004080;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* ─── Fortune cookie container & flip effect ──────────────────────── */
     #fortune {
       position: relative;
       width: 300px;
@@ -23,8 +48,6 @@
       cursor: pointer;
       margin: 0 auto;
     }
-
-    /* Cookie-shell halves using pseudo-elements */
     #fortune::before,
     #fortune::after {
       content: '';
@@ -41,7 +64,7 @@
     #fortune::before { left: 0; transform-origin: 100% 50%; }
     #fortune::after  { right: 0; transform-origin:   0% 50%; }
 
-    /* Fortune slip text styling */
+    /* ─── The “slip” inside the cookie ─────────────────────────────────── */
     .fortune-text {
       position: relative;
       display: block;
@@ -50,22 +73,23 @@
       padding: 10px 15px;
       background: #fff;
       border: 1px solid #ccc;
-      font-family: 'Times New Roman', serif;
-      color: #2a4d69;
-      font-size: 1em;
+      font-family: Georgia, serif;
+      color: #004080;
+      font-size: 1.2rem;
       text-align: center;
       line-height: 1.4;
       opacity: 0;
       transition: opacity 0.4s 0.6s ease;
       z-index: 1;
     }
-    /* Bold Lucky Numbers label */
     .fortune-text strong {
       display: block;
-      margin-top: 10px;
+      margin-top: 1em;
+      font-size: 1rem;
+      opacity: 0.8;
     }
 
-    /* Open state animations */
+    /* ─── Open state ─────────────────────────────────────────────────── */
     #fortune.open::before {
       transform: rotateY(-120deg) translateZ(10px);
     }
@@ -78,19 +102,74 @@
   </style>
 </head>
 <body>
+
+  <!-- ─── Add new fortunes ────────────────────────────────────────────── -->
+  <div id="controls">
+    <textarea id="fortune-input-text" rows="2" placeholder="Enter your fortune…"></textarea><br>
+    <input type="text" id="fortune-input-numbers" placeholder="Lucky numbers, e.g. 3,7,21"><br>
+    <button id="add-fortune-btn">Add Fortune</button>
+  </div>
+
+  <!-- ─── The clickable cookie ───────────────────────────────────────── -->
   <div id="fortune">
     <div class="fortune-text">
-      Be willing to be uncomfortable. Be comfortable being uncomfortable. It may get tough.
-      <strong>Lucky Numbers 22, 38, 4, 26, 8, 49</strong>
+      Tap the cookie to get your fortune!
     </div>
   </div>
 
   <script>
-    // Click to open and reveal
+    // ——— initialize or load saved fortunes ——————————————————
+    const STORAGE_KEY = 'fortunes';
+    const defaultFortunes = [
+      {
+        text: 'Be willing to be uncomfortable. Be comfortable being uncomfortable. It may get tough.',
+        numbers: '22, 38, 4, 26, 8, 49'
+      }
+    ];
+    let fortunes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultFortunes;
+
+    // ——— helper: persist to localStorage ————————————————————
+    function saveFortunes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fortunes));
+    }
+
+    // ——— pick & show a random fortune ————————————————————
+    const fortuneEl = document.querySelector('.fortune-text');
+    function showRandomFortune() {
+      const idx = Math.floor(Math.random() * fortunes.length);
+      const f = fortunes[idx];
+      fortuneEl.innerHTML = `
+        “${f.text}”
+        <strong>Lucky Numbers ${f.numbers}</strong>
+      `;
+    }
+
+    // ——— handle cookie click (open/close) ——————————————————
     const fc = document.getElementById('fortune');
     fc.addEventListener('click', () => {
-      fc.classList.toggle('open');
+      if (fc.classList.contains('open')) {
+        fc.classList.remove('open');
+      } else {
+        showRandomFortune();
+        fc.classList.add('open');
+      }
     });
+
+    // ——— handle adding a new fortune ————————————————————
+    document.getElementById('add-fortune-btn')
+      .addEventListener('click', () => {
+        const text = document.getElementById('fortune-input-text').value.trim();
+        const numbers = document.getElementById('fortune-input-numbers').value.trim() || '';
+        if (!text) {
+          alert('Please enter some fortune text.');
+          return;
+        }
+        fortunes.push({ text, numbers });
+        saveFortunes();
+        document.getElementById('fortune-input-text').value = '';
+        document.getElementById('fortune-input-numbers').value = '';
+        alert('✨ Fortune saved! It will appear next time you tap the cookie.');
+      });
   </script>
 </body>
 </html>
