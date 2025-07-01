@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fortune Rotator</title>
+  <title>Fortune Cookie</title>
   <style>
-    /* Page centering & background */
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -15,68 +14,82 @@
       background: #f9f9f9;
     }
 
-    /* The fortune box */
+    /* Fortune cookie container */
     #fortune {
-      font-size: 2em;
-      text-align: center;
-      padding: 20px;
-      border: 2px solid #ccc;
-      background: #fff;
-      max-width: 80%;
+      position: relative;
+      width: 300px;
+      height: 100px;
+      perspective: 600px;
       cursor: pointer;
-      /* prepare for fade transition */
-      opacity: 1;
-      transition: opacity 0.5s ease;
     }
-    /* hidden state */
-    #fortune.hidden {
+
+    /* Cookie-shell halves using pseudo-elements */
+    #fortune::before,
+    #fortune::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #fff;
+      border: 1px solid #ccc;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+      z-index: 2;
+    }
+    #fortune::before { left: 0; transform-origin: 100% 50%; }
+    #fortune::after  { right: 0; transform-origin:   0% 50%; }
+
+    /* Hidden text */
+    .fortune-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       opacity: 0;
+      transition: opacity 0.4s 0.6s ease;
+      font-size: 1.2em;
+      text-align: center;
+      padding: 0 10px;
+      z-index: 1;
+    }
+
+    /* Open state animations */
+    #fortune.open::before {
+      transform: rotateY(-120deg) translateZ(10px);
+    }
+    #fortune.open::after {
+      transform: rotateY(120deg) translateZ(10px);
+    }
+    #fortune.open .fortune-text {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
-  <div id="fortune">Tap for your fortune!</div>
+  <div id="fortune">
+    <span class="fortune-text">Tap for your fortune!</span>
+  </div>
 
   <script>
-    // Your list of fortunes
     const fortunes = [
       "A new adventure is coming your way.",
       "Trust your instincts today.",
       "You’ll make someone smile soon.",
       "Opportunity knocks lightly—be ready!",
       "A pleasant surprise is in store.",
-      "Momo sends his love.",
-      "Great things take time—be patient.",
-      "Your kindness will return to you.",
-      "Change is coming—embrace it.",
-      "Today is your lucky day!"
-      // ← add more lines here, each in quotes, separated by commas
+      "Momo sends his love."
+      // add more fortunes here
     ];
 
-    let currentIndex = -1;
-    const el = document.getElementById('fortune');
+    const fc = document.getElementById('fortune');
+    const ft = fc.querySelector('.fortune-text');
 
-    function showNextFortune() {
-      // fade out
-      el.classList.add('hidden');
-
-      // after fade-out, swap text and fade back in
-      setTimeout(() => {
-        currentIndex = (currentIndex + 1) % fortunes.length;
-        el.textContent = fortunes[currentIndex];
-        el.classList.remove('hidden');
-      }, 500);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // first fortune on load
-      showNextFortune();
-
-      // rotate on click
-      el.addEventListener('click', showNextFortune);
-
-      // auto-rotate every 10 seconds (optional)
-      setInterval(showNextFortune, 10000);
+    fc.addEventListener('click', () => {
+      // pick a random fortune
+      ft.textContent = fortunes[Math.floor(Math.random() * fortunes.length)];
+      // toggle opening animation
+      fc.classList.toggle('open');
     });
   </script>
 </body>
