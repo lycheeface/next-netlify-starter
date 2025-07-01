@@ -4,146 +4,96 @@
   <meta charset="UTF-8">
   <title>Fortune Cookie</title>
   <style>
-    /* ─── Page centering & background ───────────────────────────────── */
+    /* Center page */
     body {
-      margin: 0;
-      height: 100vh;
+      font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #eef4fb;           /* soft pale-blue page */
-      font-family: Georgia, serif;   /* textbook serif font */
+      height: 100vh;
+      margin: 0;
+      background: #f9f9f9;
     }
 
-    /* ─── Controls for adding fortunes ──────────────────────────────── */
-    #controls {
-      margin-bottom: 1.5em;
-      text-align: center;
-    }
-    #controls textarea,
-    #controls input {
-      font-family: Georgia, serif;
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin: 0.2em;
-      width: 250px;
-    }
-    #controls button {
-      padding: 0.5em 1em;
-      font-family: Georgia, serif;
-      background: #004080;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* ─── The decorative “card” container ───────────────────────────── */
+    /* Fortune cookie container */
     #fortune {
       position: relative;
-      background: #fff;
-      border: 3px solid #004080;    /* deep-blue border */
-      padding: 2em 1.5em;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+      perspective: 600px;
       cursor: pointer;
-    }
-    /* corner tabs */
-    #fortune::before,
-    #fortune::after {
-      content: "";
-      position: absolute;
-      background: #004080;
-      width: 60px;
-      height: 20px;
-    }
-    #fortune::before {
-      top: -10px;
-      left: -10px;
-    }
-    #fortune::after {
-      bottom: -10px;
-      right: -10px;
+      margin: 0 auto;
     }
 
-    /* ─── Fortune slip text styling ─────────────────────────────────── */
+    /* Cartoon cookie halves */
+    .cookie-shell {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      transition: transform 0.6s ease;
+      transform-style: preserve-3d;
+      z-index: 2;
+    }
+    .cookie-shell.left {
+      left: 0;
+      transform-origin: 100% 50%;
+    }
+    .cookie-shell.right {
+      right: 0;
+      transform-origin: 0% 50%;
+    }
+
+    /* Fortune slip text styling */
     .fortune-text {
-      margin: 0;
-      color: #004080;
-      font-size: 1.5rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.4s 0.6s ease;
+      font-family: 'Times New Roman', serif;
+      color: #2a4d69;
+      font-size: 1em;
+      text-align: center;
       line-height: 1.4;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      width: 260px;
+      box-sizing: border-box;
+      z-index: 1;
     }
     .fortune-text strong {
       display: block;
-      margin-top: 1em;
-      font-size: 1.1rem;
-      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    /* Open state animations */
+    #fortune.open .cookie-shell.left {
+      transform: rotateY(-120deg) translateZ(10px);
+    }
+    #fortune.open .cookie-shell.right {
+      transform: rotateY(120deg) translateZ(10px);
+    }
+    #fortune.open .fortune-text {
+      opacity: 1;
     }
   </style>
 </head>
-
 <body>
-  <!-- add‐new‐fortune controls -->
-  <div id="controls">
-    <textarea id="fortune-input-text" rows="2" placeholder="Enter your fortune…"></textarea><br>
-    <input type="text" id="fortune-input-numbers" placeholder="Lucky numbers, e.g. 3,7,21"><br>
-    <button id="add-fortune-btn">Add Fortune</button>
-  </div>
-
-  <!-- clickable “card” -->
   <div id="fortune">
-    <div class="fortune-text">Tap here to get a fortune!</div>
+    <img src="/images/cookie-left.png" alt="Cookie Left" class="cookie-shell left">
+    <img src="/images/cookie-right.png" alt="Cookie Right" class="cookie-shell right">
+    <div class="fortune-text">
+      Be willing to be uncomfortable. Be comfortable being uncomfortable. It may get tough.
+      <strong>Lucky Numbers 22, 38, 4, 26, 8, 49</strong>
+    </div>
   </div>
-
 
   <script>
-    const STORAGE_KEY = 'fortunes';
-    const defaultFortunes = [
-      {
-        text: 'Be willing to be uncomfortable. Be comfortable being uncomfortable. It may get tough.',
-        numbers: '22, 38, 4, 26, 8, 49'
-      }
-    ];
-
-    // load (or init) and persist
-    let fortunes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultFortunes;
-    function saveFortunes() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(fortunes));
-    }
-
-    // pick & display
-    const fortuneEl = document.querySelector('.fortune-text');
-    function showRandomFortune() {
-      const idx = Math.floor(Math.random() * fortunes.length);
-      const f = fortunes[idx];
-      fortuneEl.innerHTML = `
-        “${f.text}”
-        <strong>Lucky Numbers ${f.numbers}</strong>
-      `;
-    }
-
-    // click to get a fortune
-    document.getElementById('fortune')
-      .addEventListener('click', showRandomFortune);
-
-    // add a new one
-    document.getElementById('add-fortune-btn')
-      .addEventListener('click', () => {
-        const text = document.getElementById('fortune-input-text').value.trim();
-        const numbers = document.getElementById('fortune-input-numbers').value.trim();
-        if (!text) {
-          alert('Please enter some fortune text.');
-          return;
-        }
-        fortunes.push({ text, numbers });
-        saveFortunes();
-        document.getElementById('fortune-input-text').value = '';
-        document.getElementById('fortune-input-numbers').value = '';
-        alert('✨ Fortune saved! It will appear next time you click.');
-      });
+    const fc = document.getElementById('fortune');
+    fc.addEventListener('click', () => {
+      fc.classList.toggle('open');
+    });
   </script>
 </body>
 </html>
