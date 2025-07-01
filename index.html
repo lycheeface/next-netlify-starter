@@ -1,38 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Fortune Cookie</title>
+  <meta charset="UTF-8">
+  <title>Fortune Rotator</title>
   <style>
-    body { font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f9f9f9; }
-    #fortune { font-size: 2em; text-align: center; padding: 20px; border: 1px solid #ccc; background: #fff; }
+    /* Page centering & background */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f9f9f9;
+    }
+
+    /* The fortune box */
+    #fortune {
+      font-size: 2em;
+      text-align: center;
+      padding: 20px;
+      border: 2px solid #ccc;
+      background: #fff;
+      max-width: 80%;
+      cursor: pointer;
+      /* prepare for fade transition */
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    /* hidden state */
+    #fortune.hidden {
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
-  <div id="fortune">Tap the NFC tag to get your fortune!</div>
+  <div id="fortune">Tap for your fortune!</div>
 
   <script>
+    // Your list of fortunes
     const fortunes = [
       "A new adventure is coming your way.",
       "Trust your instincts today.",
       "You’ll make someone smile soon.",
       "Opportunity knocks lightly—be ready!",
-      "A pleasant surprise is in store."
-      "Momo sends his love."
+      "A pleasant surprise is in store.",
+      "Momo sends his love.",
+      "Great things take time—be patient.",
+      "Your kindness will return to you.",
+      "Change is coming—embrace it.",
+      "Today is your lucky day!"
       // ← add more lines here, each in quotes, separated by commas
     ];
 
-    // pick & display one at random
-    document.getElementById('fortune').textContent =
-      fortunes[Math.floor(Math.random() * fortunes.length)];
+    let currentIndex = -1;
+    const el = document.getElementById('fortune');
+
+    function showNextFortune() {
+      // fade out
+      el.classList.add('hidden');
+
+      // after fade-out, swap text and fade back in
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % fortunes.length;
+        el.textContent = fortunes[currentIndex];
+        el.classList.remove('hidden');
+      }, 500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // first fortune on load
+      showNextFortune();
+
+      // rotate on click
+      el.addEventListener('click', showNextFortune);
+
+      // auto-rotate every 10 seconds (optional)
+      setInterval(showNextFortune, 10000);
+    });
   </script>
 </body>
 </html>
-
-
-
-
-
-
-Create index.html with fortune-rotator
-      
