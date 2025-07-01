@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Fortune Cookie</title>
   <style>
-    /* ─── Page centering & background ─────────────────────────────────── */
+    /* ─── Page centering & background ───────────────────────────────── */
     body {
       margin: 0;
       height: 100vh;
@@ -12,11 +12,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #eef4fb;
-      font-family: Georgia, serif;
+      background: #eef4fb;           /* soft pale-blue page */
+      font-family: Georgia, serif;   /* textbook serif font */
     }
 
-    /* ─── Controls for adding fortunes ─────────────────────────────────── */
+    /* ─── Controls for adding fortunes ──────────────────────────────── */
     #controls {
       margin-bottom: 1.5em;
       text-align: center;
@@ -40,85 +40,66 @@
       cursor: pointer;
     }
 
-    /* ─── Fortune cookie container & flip effect ──────────────────────── */
+    /* ─── The decorative “card” container ───────────────────────────── */
     #fortune {
       position: relative;
-      width: 300px;
-      perspective: 600px;
+      background: #fff;
+      border: 3px solid #004080;    /* deep-blue border */
+      padding: 2em 1.5em;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       cursor: pointer;
-      margin: 0 auto;
     }
+    /* corner tabs */
     #fortune::before,
     #fortune::after {
-      content: '';
+      content: "";
       position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      background: #fff;
-      border: 1px solid #ccc;
-      transform-style: preserve-3d;
-      transition: transform 0.6s ease;
-      z-index: 2;
+      background: #004080;
+      width: 60px;
+      height: 20px;
     }
-    #fortune::before { left: 0; transform-origin: 100% 50%; }
-    #fortune::after  { right: 0; transform-origin:   0% 50%; }
+    #fortune::before {
+      top: -10px;
+      left: -10px;
+    }
+    #fortune::after {
+      bottom: -10px;
+      right: -10px;
+    }
 
-    /* ─── The “slip” inside the cookie ─────────────────────────────────── */
+    /* ─── Fortune slip text styling ─────────────────────────────────── */
     .fortune-text {
-      position: relative;
-      display: block;
-      width: 280px;
-      margin: 10px auto;
-      padding: 10px 15px;
-      background: #fff;
-      border: 1px solid #ccc;
-      font-family: Georgia, serif;
+      margin: 0;
       color: #004080;
-      font-size: 1.2rem;
-      text-align: center;
+      font-size: 1.5rem;
       line-height: 1.4;
-      opacity: 0;
-      transition: opacity 0.4s 0.6s ease;
-      z-index: 1;
     }
     .fortune-text strong {
       display: block;
       margin-top: 1em;
-      font-size: 1rem;
+      font-size: 1.1rem;
       opacity: 0.8;
-    }
-
-    /* ─── Open state ─────────────────────────────────────────────────── */
-    #fortune.open::before {
-      transform: rotateY(-120deg) translateZ(10px);
-    }
-    #fortune.open::after {
-      transform: rotateY(120deg) translateZ(10px);
-    }
-    #fortune.open .fortune-text {
-      opacity: 1;
     }
   </style>
 </head>
-<body>
 
-  <!-- ─── Add new fortunes ────────────────────────────────────────────── -->
+<body>
+  <!-- add‐new‐fortune controls -->
   <div id="controls">
     <textarea id="fortune-input-text" rows="2" placeholder="Enter your fortune…"></textarea><br>
     <input type="text" id="fortune-input-numbers" placeholder="Lucky numbers, e.g. 3,7,21"><br>
     <button id="add-fortune-btn">Add Fortune</button>
   </div>
 
-  <!-- ─── The clickable cookie ───────────────────────────────────────── -->
+  <!-- clickable “card” -->
   <div id="fortune">
-    <div class="fortune-text">
-      Tap the cookie to get your fortune!
-    </div>
+    <div class="fortune-text">Tap here to get a fortune!</div>
   </div>
 
+
   <script>
-    // ——— initialize or load saved fortunes ——————————————————
     const STORAGE_KEY = 'fortunes';
     const defaultFortunes = [
       {
@@ -126,14 +107,14 @@
         numbers: '22, 38, 4, 26, 8, 49'
       }
     ];
-    let fortunes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultFortunes;
 
-    // ——— helper: persist to localStorage ————————————————————
+    // load (or init) and persist
+    let fortunes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultFortunes;
     function saveFortunes() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(fortunes));
     }
 
-    // ——— pick & show a random fortune ————————————————————
+    // pick & display
     const fortuneEl = document.querySelector('.fortune-text');
     function showRandomFortune() {
       const idx = Math.floor(Math.random() * fortunes.length);
@@ -144,22 +125,15 @@
       `;
     }
 
-    // ——— handle cookie click (open/close) ——————————————————
-    const fc = document.getElementById('fortune');
-    fc.addEventListener('click', () => {
-      if (fc.classList.contains('open')) {
-        fc.classList.remove('open');
-      } else {
-        showRandomFortune();
-        fc.classList.add('open');
-      }
-    });
+    // click to get a fortune
+    document.getElementById('fortune')
+      .addEventListener('click', showRandomFortune);
 
-    // ——— handle adding a new fortune ————————————————————
+    // add a new one
     document.getElementById('add-fortune-btn')
       .addEventListener('click', () => {
         const text = document.getElementById('fortune-input-text').value.trim();
-        const numbers = document.getElementById('fortune-input-numbers').value.trim() || '';
+        const numbers = document.getElementById('fortune-input-numbers').value.trim();
         if (!text) {
           alert('Please enter some fortune text.');
           return;
@@ -168,7 +142,7 @@
         saveFortunes();
         document.getElementById('fortune-input-text').value = '';
         document.getElementById('fortune-input-numbers').value = '';
-        alert('✨ Fortune saved! It will appear next time you tap the cookie.');
+        alert('✨ Fortune saved! It will appear next time you click.');
       });
   </script>
 </body>
